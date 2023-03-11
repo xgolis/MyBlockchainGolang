@@ -3,25 +3,25 @@ package faza
 import "hash/fnv"
 
 type UTXO struct {
-	txHash []byte
-	index  int
+	TxHash []byte
+	Index  int
 }
 
 /**
 * Porovná toto UTXO s tým, ktoré bolo zadané v {@code other}, považuje ich za
-* rovnocenné ak majú pole {@code txHash} s rovnakým obsahom a rovnaké hodnoty
-* {@code index}
+* rovnocenné ak majú pole {@code TxHash} s rovnakým obsahom a rovnaké hodnoty
+* {@code Index}
  */
 func (u *UTXO) equals(utxo UTXO) bool {
-	hash := utxo.txHash
-	in := utxo.index
+	hash := utxo.TxHash
+	in := utxo.Index
 
-	if len(hash) != len(u.txHash) || u.index != in {
+	if len(hash) != len(u.TxHash) || u.Index != in {
 		return false
 	}
 
 	for i := 0; i < len(hash); i++ {
-		if hash[i] != u.txHash[i] {
+		if hash[i] != u.TxHash[i] {
 			return false
 		}
 	}
@@ -41,21 +41,21 @@ func hashCode(arr []byte) int {
  */
 func (u *UTXO) hashCode() int {
 	hash := 1
-	hash = hash*17 + u.index
-	hash = hash*31 + hashCode(u.txHash)
+	hash = hash*17 + u.Index
+	hash = hash*31 + hashCode(u.TxHash)
 	return hash
 }
 
 /** Porovná toto UTXO so špecifikovaným v {@code utxo} */
 func (u *UTXO) compareTo(utxo UTXO) int {
-	hash := utxo.txHash
-	in := utxo.index
-	if in > u.index {
+	hash := utxo.TxHash
+	in := utxo.Index
+	if in > u.Index {
 		return -1
-	} else if in < u.index {
+	} else if in < u.Index {
 		return 1
 	} else {
-		len1 := len(u.txHash)
+		len1 := len(u.TxHash)
 		len2 := len(hash)
 		if len2 > len1 {
 			return -1
@@ -63,9 +63,9 @@ func (u *UTXO) compareTo(utxo UTXO) int {
 			return 1
 		} else {
 			for i := 0; i < len1; i++ {
-				if hash[i] > u.txHash[i] {
+				if hash[i] > u.TxHash[i] {
 					return -1
-				} else if hash[i] < u.txHash[i] {
+				} else if hash[i] < u.TxHash[i] {
 					return 1
 				}
 			}

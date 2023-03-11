@@ -14,9 +14,9 @@ import (
 type Transaction struct {
 	// input   Input
 	// output  Output
-	hash    []byte
-	inputs  []Input
-	outputs []Output
+	Hash    []byte   `json:"hash"`
+	Inputs  []Input  `json:"inputs"`
+	Outputs []Output `json:"outpus"`
 }
 
 type Output struct {
@@ -60,7 +60,7 @@ func (i *Input) addSignature(sig []byte) {
 // }
 
 // func (t *Transaction) Transaction(tx Transaction) {
-// 	t.hash = tx.hash
+// 	t.Hash = tx.Hash
 // 	t.inputs = tx.inputs
 // 	t.outputs = tx.outputs
 // }
@@ -70,7 +70,7 @@ func (t *Transaction) AddInput(prevTxHash []byte, outputIndex int) {
 		prevTxHash:  prevTxHash,
 		outputIndex: outputIndex,
 	}
-	t.inputs = append(t.inputs, in)
+	t.Inputs = append(t.Inputs, in)
 }
 
 func (t *Transaction) AddOutput(value float64, address *rsa.PublicKey) {
@@ -78,26 +78,26 @@ func (t *Transaction) AddOutput(value float64, address *rsa.PublicKey) {
 		value:   value,
 		address: address,
 	}
-	t.outputs = append(t.outputs, op)
+	t.Outputs = append(t.Outputs, op)
 }
 
 func RemoveIndex(s []Input, index int) []Input {
 	return append(s[:index], s[index+1:]...)
 }
 
-func (t *Transaction) removeInput(value int) {
-	t.inputs = RemoveIndex(t.inputs, value)
+func (t *Transaction) RemoveInput(value int) {
+	t.Inputs = RemoveIndex(t.Inputs, value)
 }
 
-func (t *Transaction) removeInputUTXO(ut UTXO) {
-	for i := 0; i < len(t.inputs); i++ {
-		in := t.inputs[i]
+func (t *Transaction) RemoveInputUTXO(ut UTXO) {
+	for i := 0; i < len(t.Inputs); i++ {
+		in := t.Inputs[i]
 		u := &UTXO{
-			txHash: in.prevTxHash,
-			index:  in.outputIndex,
+			TxHash: in.prevTxHash,
+			Index:  in.outputIndex,
 		}
 		if u.equals(ut) {
-			t.removeInput(i)
+			t.RemoveInput(i)
 			return
 		}
 	}
@@ -113,10 +113,10 @@ func getModulus(key *rsa.PublicKey) *big.Int {
 
 func (t *Transaction) getDataToSign(index int) []byte {
 	sigData := []byte{}
-	if index > len(t.inputs) {
+	if index > len(t.Inputs) {
 		return nil
 	}
-	in := t.inputs[index]
+	in := t.Inputs[index]
 	prevTxHash := in.prevTxHash
 
 	b := ByteBuffer.Buffer{}
@@ -132,7 +132,7 @@ func (t *Transaction) getDataToSign(index int) []byte {
 		sigData = append(sigData, outputIndex[i])
 	}
 
-	for _, op := range t.outputs {
+	for _, op := range t.Outputs {
 		bo := ByteBuffer.Buffer{}
 		bo.PutDouble(op.value)
 		value := bo.Array()
@@ -158,12 +158,12 @@ func (t *Transaction) getDataToSign(index int) []byte {
 }
 
 func (t *Transaction) addSignature(signature []byte, index int) {
-	t.inputs[index].addSignature(signature)
+	t.Inputs[index].addSignature(signature)
 }
 
-func (t *Transaction) getTx() []byte {
+func (t *Transaction) GetTx() []byte {
 	Tx := []byte{}
-	for _, in := range t.inputs {
+	for _, in := range t.Inputs {
 		prevTxHash := in.prevTxHash
 		b := ByteBuffer.Buffer{}
 		b.PutInt(in.outputIndex)
@@ -183,7 +183,7 @@ func (t *Transaction) getTx() []byte {
 			}
 		}
 	}
-	for _, op := range t.outputs {
+	for _, op := range t.Outputs {
 		b := ByteBuffer.Buffer{}
 		b.PutDouble(op.value)
 		value := b.Array()
@@ -209,7 +209,8 @@ func (t *Transaction) getTx() []byte {
 }
 
 func (t *Transaction) SignTx(pr_key *rsa.PrivateKey, input int) error {
-	signature, err := pr_key.Sign(rand.Reader, t.getDataToSign(input), crypto.SHA256)
+	hashed := sha256.Sum256(t.getDataToSign(input))
+	signature, err := rsa.SignPKCS1v15(rand.Reader, pr_key, crypto.SHA256, hashed[:])
 	if err != nil {
 		return fmt.Errorf("error while creating signature: %v", err)
 	}
@@ -220,27 +221,27 @@ func (t *Transaction) SignTx(pr_key *rsa.PrivateKey, input int) error {
 
 func (t *Transaction) finalize() {
 	md := sha256.New()
-	_, err := md.Write(t.getTx())
+	_, err := md.Write(t.GetTx())
 	if err != nil {
 		panic(err)
 	}
-	t.hash = md.Sum(nil)
+	t.Hash = md.Sum(nil)
 }
 
-func (t *Transaction) setHash(h []byte) {
-	t.hash = h
+func (t *Transaction) SetHash(h []byte) {
+	t.Hash = h
 }
 
-func (t *Transaction) getInput(index int) Input {
-	if index < len(t.inputs) {
-		return t.inputs[index]
+func (t *Transaction) GetInput(index int) Input {
+	if index < len(t.Inputs) {
+		return t.Inputs[index]
 	}
 	return Input{}
 }
 
-func (t *Transaction) getOutput(index int) Output {
-	if index < len(t.inputs) {
-		return t.outputs[index]
+func (t *Transaction) GetOutput(index int) Output {
+	if index < len(t.Inputs) {
+		return t.Outputs[index]
 	}
 	return Output{}
 }

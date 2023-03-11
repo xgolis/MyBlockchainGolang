@@ -18,28 +18,46 @@ func main() {
 	// 	key_alice[i] = byte(1)
 	// }
 
-	prGen_bob, err := rsa.GenerateKey(rand.Reader, 32)
+	prGen_bob, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic("unable to generate private key")
 	}
-	prGen_alice, err := rsa.GenerateKey(rand.Reader, 32)
+	prGen_alice, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic("unable to generate private key")
 	}
 
-	pk_bob := prGen_bob.PublicKey
-	// pk_alice := prGen_alice.PublicKey
+	publicKeyBob := prGen_bob.PublicKey
+	publicKeyAlice := prGen_alice.PublicKey
 
-	fmt.Printf("bob:%d, alice: %d\n", prGen_alice, prGen_bob)
+	fmt.Printf("bob:%d, alice: %d\n", publicKeyBob, publicKeyAlice)
 	// prGen_bob = *rsa.PrivateKey
 	// crypto.PrivateKey.Public()
 
 	tx := faza.Transaction{}
-	tx.AddOutput(10, &pk_bob)
+	tx.AddOutput(10, &publicKeyBob)
 
 	initialHash := []byte{0}
 	tx.AddInput(initialHash, 0)
 
 	tx.SignTx(prGen_bob, 0)
-	// prGen_alice.Sign(rand.Reader, )
+
+	utxoPool := faza.NewUTXOPool()
+	utxo := faza.UTXO{
+		TxHash: tx.Hash,
+		Index:  0,
+	}
+	utxoPool.AddUTXO(utxo, tx.GetOutput(0))
+
+	tx2 := faza.Transaction{}
+	tx2.AddInput(tx.Hash, 0)
+
+	tx2.AddOutput(5, &publicKeyAlice)
+	tx2.AddOutput(3, &publicKeyAlice)
+	tx2.AddOutput(2, &publicKeyAlice)
+
+	err = tx2.SignTx(prGen_bob, 0)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
