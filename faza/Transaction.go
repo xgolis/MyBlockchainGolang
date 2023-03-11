@@ -1,8 +1,11 @@
-package main
+package faza
 
 import (
+	"crypto"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"fmt"
 	"math/big"
 
 	"github.com/pounze/ByteBuffer_golang/src/ByteBuffer"
@@ -62,7 +65,7 @@ func (i *Input) addSignature(sig []byte) {
 // 	t.outputs = tx.outputs
 // }
 
-func (t *Transaction) addInput(prevTxHash []byte, outputIndex int) {
+func (t *Transaction) AddInput(prevTxHash []byte, outputIndex int) {
 	in := Input{
 		prevTxHash:  prevTxHash,
 		outputIndex: outputIndex,
@@ -70,7 +73,7 @@ func (t *Transaction) addInput(prevTxHash []byte, outputIndex int) {
 	t.inputs = append(t.inputs, in)
 }
 
-func (t *Transaction) addOutput(value float64, address *rsa.PublicKey) {
+func (t *Transaction) AddOutput(value float64, address *rsa.PublicKey) {
 	op := Output{
 		value:   value,
 		address: address,
@@ -203,6 +206,16 @@ func (t *Transaction) getTx() []byte {
 		i++
 	}
 	return tx
+}
+
+func (t *Transaction) SignTx(pr_key *rsa.PrivateKey, input int) error {
+	signature, err := pr_key.Sign(rand.Reader, t.getDataToSign(input), crypto.SHA256)
+	if err != nil {
+		return fmt.Errorf("error while creating signature: %v", err)
+	}
+	t.addSignature(signature, input)
+	t.finalize()
+	return nil
 }
 
 func (t *Transaction) finalize() {

@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 
-	"github.com/xgolis/MyBlockchainGolang/faza1"
+	"github.com/xgolis/MyBlockchainGolang/faza"
 )
 
 func main() {
@@ -27,8 +27,19 @@ func main() {
 		panic("unable to generate private key")
 	}
 
-	fmt.Printf("bob:%d, alice: %d", prGen_alice, prGen_bob)
+	pk_bob := prGen_bob.PublicKey
+	// pk_alice := prGen_alice.PublicKey
+
+	fmt.Printf("bob:%d, alice: %d\n", prGen_alice, prGen_bob)
 	// prGen_bob = *rsa.PrivateKey
 	// crypto.PrivateKey.Public()
-	_ = faza1.UTXOPool{}
+
+	tx := faza.Transaction{}
+	tx.AddOutput(10, &pk_bob)
+
+	initialHash := []byte{0}
+	tx.AddInput(initialHash, 0)
+
+	tx.SignTx(prGen_bob, 0)
+	// prGen_alice.Sign(rand.Reader, )
 }

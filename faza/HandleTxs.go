@@ -1,4 +1,4 @@
-package faza1
+package faza
 
 // type HandleTxs struct {
 
@@ -12,10 +12,10 @@ func UTXOPoolGet() UTXOPool {
 	return UTXOPool{}
 }
 
-func txIsValid(tx Transaction) bool {
+func TxIsValid(tx Transaction) bool {
 	return false
 }
 
-func handler(possibleTxs []Transaction) []Transaction {
+func Handler(possibleTxs []Transaction) []Transaction {
 	return []Transaction{}
 }

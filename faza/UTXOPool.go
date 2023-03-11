@@ -1,4 +1,4 @@
-package faza1
+package faza
 
 type UTXOPool struct {
 	/**
