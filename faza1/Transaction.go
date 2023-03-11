@@ -1,4 +1,4 @@
-package faza1
+package main
 
 import (
 	"crypto/rsa"
