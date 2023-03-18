@@ -1,4 +1,4 @@
-package faza
+package firstPhase
 
 import "hash/fnv"
 

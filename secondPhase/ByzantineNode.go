@@ -12,9 +12,11 @@ package secondPhase
 type ByzantineNode struct {
 }
 
-//  func (b *ByzantineNode) ByzantineNode()
+func (b *ByzantineNode) Node(p_graph float64, p_byzantine float64, p_txDistribution float64, numRounds int) {
+	return
+}
 
-func (b *ByzantineNode) followeesSet(followees []byte) {
+func (b *ByzantineNode) followeesSet(followees []bool) {
 	return
 }
 

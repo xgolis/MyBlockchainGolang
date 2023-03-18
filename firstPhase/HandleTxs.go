@@ -1,4 +1,4 @@
-package faza-1
+package firstPhase
 
 import (
 	"crypto"
