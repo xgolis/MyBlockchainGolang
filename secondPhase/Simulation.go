@@ -1,6 +1,7 @@
 package secondPhase
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -102,7 +103,51 @@ func Simulation(args []string) {
 	}
 
 	// Simuluj numRounds-krat
-	for round:=0;round<numRounds;round++ {
-		
+	for round := 0; round < numRounds; round++ {
+
+		// zhromaždiť všetky návrhy do mapy. Kľúčom je index uzla prijímajúceho
+		// návrhy. Hodnota je ArrayList obsahujúci polia celých čísel 1x2. Prvým
+		// prvkom každého poľa je ID navrhovanej transakcie a druhý
+		// element je indexové číslo uzla navrhujúceho transakciu.
+
+		allProposals := make(map[int][][2]int)
+		for i := 0; i < numNodes; i++ {
+			proposals := nodes[i].followersSend()
+			for _, tx := range proposals {
+				if !containsValue(validTxIds, tx.id) {
+					continue
+				}
+
+				for j := 0; j < numNodes; j++ {
+					if !followees[i][j] {
+						continue
+					}
+
+					canditate := [2]int{}
+					canditate[0] = tx.id
+					canditate[1] = i
+					allProposals[j] = append(allProposals[j], [2]int(canditate))
+
+				}
+			}
+		}
+		// Distribuuje návrhy k ich zamýšľaným príjemcom ako kandidátom
+		for i := 0; i < numNodes; i++ {
+			if _, ok := allProposals[i]; ok {
+				nodes[i].followeesReceive(allProposals[i])
+			}
+		}
+	}
+
+	// vypíš výsledky
+
+	for i := 0; i < numNodes; i++ {
+		transactions := nodes[i].followersSend()
+		fmt.Printf("Transaction ids that Node %d believes consensus on:", i)
+		for _, tx := range transactions {
+			fmt.Println(tx.id)
+		}
+		fmt.Println()
+		fmt.Println()
 	}
 }

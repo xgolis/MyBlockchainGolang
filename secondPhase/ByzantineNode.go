@@ -28,6 +28,6 @@ func (b *ByzantineNode) followersSend() []Transaction {
 	return []Transaction{}
 }
 
-func (b *ByzantineNode) followeesReceive(candidates [][]int) {
+func (b *ByzantineNode) followeesReceive(candidates [][2]int) {
 	return
 }

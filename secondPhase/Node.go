@@ -6,5 +6,5 @@ type Node interface {
 	followeesSet(followees []bool)
 	pendingTransactionSet(pendingTransactions []Transaction)
 	followersSend() []Transaction
-	followeesReceive(candidates [][]int)
+	followeesReceive(candidates [][2]int)
 }

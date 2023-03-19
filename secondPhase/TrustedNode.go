@@ -19,6 +19,6 @@ func (b *TrustedNode) followersSend() []Transaction {
 	return []Transaction{}
 }
 
-func (b *TrustedNode) followeesReceive(candidates [][]int) {
+func (b *TrustedNode) followeesReceive(candidates [][2]int) {
 	return
 }
