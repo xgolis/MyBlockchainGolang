@@ -2,6 +2,7 @@ package thirdphase
 
 import (
 	"crypto/rsa"
+	"fmt"
 )
 
 type HandleBlocks struct {
@@ -32,6 +33,12 @@ func (h *HandleBlocks) BlockCreate(myAddress *rsa.PublicKey) Block {
 	}
 	txs := txPool.GetTransactions()
 	rTxs := handler.Handler(txs)
+	if len(txs) != len(rTxs) {
+		fmt.Println("not validated")
+		return Block{
+			Hash: nil,
+		}
+	}
 	for i := 0; i < len(rTxs); i++ {
 		current.TransactionAdd(rTxs[i])
 	}
@@ -39,7 +46,9 @@ func (h *HandleBlocks) BlockCreate(myAddress *rsa.PublicKey) Block {
 	if h.BlockChain.BlockAdd(current) {
 		return current
 	} else {
-		return Block{}
+		return Block{
+			Hash: nil,
+		}
 	}
 }
 

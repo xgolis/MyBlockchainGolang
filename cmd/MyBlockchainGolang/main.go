@@ -1,9 +1,8 @@
 package main
 
-import thirdphase "github.com/xgolis/MyBlockchainGolang/thirdPhase"
-
+// spustajte testy cez príkaz go test ./thirdphase alebo go test ./firstphase
 func main() {
 	// firstPhase.DoMain()
 	// secondPhase.Simulation()
-	thirdphase.ThirdPhaseMain()
+	// thirdphase.ThirdPhaseMain()
 }

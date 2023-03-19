@@ -120,7 +120,10 @@ func (b *Blockchain) BlockAdd(block Block) bool {
 		UTXOPool: parent.UPool,
 	}
 
+	fmt.Println(len(block.Txs))
 	validTxs := handler.Handler(block.Txs)
+	fmt.Println(len(validTxs))
+	fmt.Println(len(block.Txs))
 	if len(validTxs) != len(block.Txs) {
 		fmt.Println("not validated")
 		return false
