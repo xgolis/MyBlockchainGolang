@@ -69,17 +69,14 @@ func (h *HandleTxs) TxIsValid(tx Transaction) bool {
 }
 
 func (h *HandleTxs) firstCondition(tx Transaction) bool {
-	isInPool := false
-	for _, txOutput := range tx.Outputs {
-		for _, output := range h.UTXOPool.H {
-			if output.address == txOutput.address && output.value == txOutput.value {
-				isInPool = true
-			}
+	for _, input := range tx.Inputs {
+		utxo := UTXO{
+			TxHash: input.prevTxHash,
+			Index:  input.outputIndex,
 		}
-		if !isInPool {
-			return false
+		if !h.UTXOPool.Contains(utxo) {
+			return true
 		}
-		isInPool = false
 	}
 	return true
 }

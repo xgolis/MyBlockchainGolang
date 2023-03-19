@@ -6,7 +6,8 @@ import (
 	"fmt"
 )
 
-func DoMain() {
+// Add tests for the first phase here
+func TestHandler() bool {
 	prGen_bob, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic("unable to generate private key")
@@ -19,9 +20,7 @@ func DoMain() {
 	publicKeyBob := prGen_bob.PublicKey
 	publicKeyAlice := prGen_alice.PublicKey
 
-	fmt.Printf("bob:%d, alice: %d\n", publicKeyBob, publicKeyAlice)
-	// prGen_bob = *rsa.PrivateKey
-	// crypto.PrivateKey.Public()
+	// fmt.Printf("bob:%d, alice: %d\n", publicKeyBob, publicKeyAlice)
 
 	tx := Transaction{}
 	tx.AddOutput(10, &publicKeyBob)
@@ -41,12 +40,6 @@ func DoMain() {
 	handleTxs := HandleTxs{
 		UTXOPool: *utxoPool,
 	}
-	// handleTxs.HandleTxs(*utxoPool)
-	// fmt.Printf("handleTxs.txIsValid(tx) returns: %t\n", handleTxs.TxIsValid(tx))
-	// fmt.Println(handleTxs.UTXOPool)
-	// handleTxs.Handler([]Transaction{tx})
-	// fmt.Println(handleTxs.UTXOPool)
-	// fmt.Printf("handleTxs.Handler([]Transaction{tx}) returns: %v", handleTxs.Handler([]Transaction{tx}))
 
 	tx2 := Transaction{}
 	tx2.AddInput(tx.Hash, 0)
@@ -60,7 +53,6 @@ func DoMain() {
 		fmt.Println(err)
 	}
 
-	// utxoPool = NewUTXOPool()
 	utxo = UTXO{
 		TxHash: tx2.Hash,
 		Index:  0,
@@ -80,9 +72,11 @@ func DoMain() {
 	handleTxs = HandleTxs{
 		UTXOPool: *utxoPool,
 	}
-	// handleTxs.HandleTxs(*utxoPool)
-	// fmt.Printf("handleTxs.txIsValid(tx) returns: %t", handleTxs.TxIsValid(tx2))
-	handleTxs.Handler([]Transaction{tx2})
-	// fmt.Printf("handleTxs.Handler([]Transaction{tx,tx2}) returns: %v", handleTxs.Handler([]Transaction{tx, tx2}))
 
+	txs := []Transaction{tx2}
+	validTxs := handleTxs.Handler(txs)
+	if len(validTxs) == len(txs) {
+		return true
+	}
+	return false
 }
