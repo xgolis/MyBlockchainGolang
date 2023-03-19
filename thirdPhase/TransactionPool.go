@@ -5,6 +5,9 @@ type TransactionPool struct {
 }
 
 func (t *TransactionPool) AddTransaction(tx Transaction) {
+	if t.H == nil {
+		t.H = make(map[*ByteArrayWrapper]Transaction)
+	}
 	hash := ByteArrayWrapper{
 		Contents: tx.Hash,
 	}

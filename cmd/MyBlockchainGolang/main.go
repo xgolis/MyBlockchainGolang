@@ -1,10 +1,9 @@
 package main
 
-import (
-	"github.com/xgolis/MyBlockchainGolang/firstPhase"
-)
+import thirdphase "github.com/xgolis/MyBlockchainGolang/thirdPhase"
 
 func main() {
-	firstPhase.DoMain()
+	// firstPhase.DoMain()
 	// secondPhase.Simulation()
+	thirdphase.ThirdPhaseMain()
 }

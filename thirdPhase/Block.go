@@ -15,31 +15,31 @@ type Block struct {
 const COINBASE = 6.25
 
 /** {@code address} je adresa, na ktorú bude poslaná coinbase transakcia */
-func (b *Block) Block(prevHash []byte, address *rsa.PublicKey) {
-	b.PrevBlockHash = prevHash
-	b.Coinbase = NewCoinbaseTx(COINBASE, address)
-	b.Txs = []Transaction{}
+func NewBlock(prevHash []byte, address *rsa.PublicKey) Block {
+	Coinbase := NewCoinbaseTx(COINBASE, address)
+	Txs := []Transaction{}
+	return Block{
+		PrevBlockHash: prevHash,
+		Coinbase:      Coinbase,
+		Txs:           Txs,
+	}
 }
 
-func (b *Block) GetCoinbase() Transaction {
-	return b.Coinbase
-}
+// func (b *Block) GetHash() []byte {
+// 	return b.Hash
+// }
 
-func (b *Block) GetHash() []byte {
-	return b.Hash
-}
+// func (b *Block) GetPrevBlockHash() []byte {
+// 	return b.PrevBlockHash
+// }
 
-func (b *Block) GetPrevBlockHash() []byte {
-	return b.PrevBlockHash
-}
+// func (b *Block) GetTransactions() []Transaction {
+// 	return b.Txs
+// }
 
-func (b *Block) GetTransactions() []Transaction {
-	return b.Txs
-}
-
-func (b *Block) GetTransaction(index int) Transaction {
-	return b.Txs[index]
-}
+// func (b *Block) GetTransaction(index int) Transaction {
+// 	return b.Txs[index]
+// }
 
 func (b *Block) TransactionAdd(tx Transaction) {
 	b.Txs = append(b.Txs, tx)
@@ -65,7 +65,7 @@ func (b *Block) GetBlock() []byte {
 	return raw
 }
 
-func (b *Block) finalize() {
+func (b *Block) Finalize() {
 	md := sha256.New()
 	_, err := md.Write(b.GetBlock())
 	if err != nil {

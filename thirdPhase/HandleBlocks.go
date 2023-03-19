@@ -1,9 +1,11 @@
 package thirdphase
 
-import "crypto/rsa"
+import (
+	"crypto/rsa"
+)
 
 type HandleBlocks struct {
-	BlockChain Blockchain
+	BlockChain *Blockchain
 }
 
 /**
@@ -20,12 +22,11 @@ func (h *HandleBlocks) BlockProcess(block Block) bool {
 
 /** vytvor nový {@code block} nad max height {@code block} */
 func (h *HandleBlocks) BlockCreate(myAddress *rsa.PublicKey) Block {
-	parent := h.BlockChain.GetBlockAtMaxHeight()
-	parentHash := parent.GetHash()
-	current := Block{}
-	current.Block(parentHash, myAddress)
+	parent, _ := h.BlockChain.GetBlockAtMaxHeight()
+	parentHash := parent.Hash
+	current := NewBlock(parentHash, myAddress)
 	uPool := h.BlockChain.GetUTXOPoolAtMaxHeight()
-	txPool := h.BlockChain.GetTransactionPool()
+	txPool := h.BlockChain.TransactionPool
 	handler := HandleTxs{
 		UTXOPool: uPool,
 	}
@@ -34,7 +35,7 @@ func (h *HandleBlocks) BlockCreate(myAddress *rsa.PublicKey) Block {
 	for i := 0; i < len(rTxs); i++ {
 		current.TransactionAdd(rTxs[i])
 	}
-	current.finalize()
+	current.Finalize()
 	if h.BlockChain.BlockAdd(current) {
 		return current
 	} else {
